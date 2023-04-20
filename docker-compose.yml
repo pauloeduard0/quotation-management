@@ -1,4 +1,5 @@
 version: "3.3"
+
 services:
 
   mysql:
@@ -13,6 +14,33 @@ services:
     networks:
       - inatel
 
+  stock-manager:
+    image: adautomendes/stock-manager
+    container_name: stock-manager
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+    networks:
+      - inatel
+
+  quotationmanagement:
+    image: quotation-management
+    container_name: quotation-management
+    ports:
+      - 8081:8081
+    environment:
+      - MYSQL_CONTAINER=mysql
+      - STOCK_MANAGER_CONTAINER=stock-manager
+      - QUOTATION_MANAGER_CONTAINER=quotation-management
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - inatel
+    depends_on:
+      - stockmanager
+      - mysql
+
 networks:
   inatel:
     driver: bridge
+  Footer
