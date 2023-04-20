@@ -1,0 +1,18 @@
+version: "3.3"
+services:
+
+  mysql:
+    image: mysql
+    container_name: mysql
+    ports:
+      - 3306:3306
+      - 33060:33060
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=bootdb
+    networks:
+      - inatel
+
+networks:
+  inatel:
+    driver: bridge
