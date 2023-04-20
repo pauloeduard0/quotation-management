@@ -25,4 +25,9 @@ public class Quote {
     private LocalDate date;
     private BigDecimal price;
 
+    public Quote(Stock stock, LocalDate date, BigDecimal price) {
+        this.stock = stock;
+        this.date = date;
+        this.price = price;
+    }
 }
