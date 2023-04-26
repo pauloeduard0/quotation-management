@@ -1,7 +1,6 @@
 version: "3.3"
 
 services:
-
   mysql:
     image: mysql
     container_name: mysql
@@ -19,28 +18,41 @@ services:
     container_name: stock-manager
     ports:
       - 8080:8080
+    environment:
+      - SERVER_HOST = stock-manager
+      - SERVER_PORT = 8080
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       - mysql
     networks:
       - inatel
 
-  quotationmanagement:
-    image: quotation-management
+  quotation-management:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+      args:
+        JAR_FILE: target/quotation-management-0.0.1-SNAPSHOT.jar
+    image: adautomendes/quotation-management
     container_name: quotation-management
     ports:
       - 8081:8081
     environment:
-      - MYSQL_CONTAINER=mysql
-      - STOCK_MANAGER_CONTAINER=stock-manager
-      - QUOTATION_MANAGER_CONTAINER=quotation-management
+      - SERVER_HOST=quotation-management
+      - SERVER_PORT=8081
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - STOCK_MANAGER_HOST=stock-manager
+      - STOCK_MANAGER_PORT=8080
       - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - stock-manager
+      - mysql
     networks:
       - inatel
-    depends_on:
-      - stockmanager
-      - mysql
 
 networks:
   inatel:
     driver: bridge
-  Footer
