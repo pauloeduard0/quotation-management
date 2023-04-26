@@ -1,32 +1,32 @@
 package com.inatel.quotationmanagement.model.entities;
 
-import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-@Entity(name = "Stock")
-@Getter
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class Stock {
+@Builder
+@Data
+public class StockQuote {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     private String stockId;
 
-    @OneToMany(mappedBy = "stock")
+    @OneToMany(mappedBy = "stockQuote", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Quote> quotes = new ArrayList<>();
 
     public void addQuote(Quote quote) {
-        quote.add(quote);
+        quotes.add(quote);
         quote.setStockQuote(this);
     }
 }
