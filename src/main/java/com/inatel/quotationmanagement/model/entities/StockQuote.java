@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Table(name = "stock_quote")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

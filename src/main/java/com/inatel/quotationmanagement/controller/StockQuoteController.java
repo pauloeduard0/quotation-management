@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class StockQuoteController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<StockQuoteDto> saveQuote(@Valid @RequestBody StockQuoteDto stockQuoteDto)
     {
         return ResponseEntity.created(null).body(stockQuoteService.saveStockQuote(stockQuoteDto));

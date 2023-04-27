@@ -10,6 +10,7 @@ import java.util.UUID;
 import jakarta.persistence.Entity;
 import lombok.*;
 
+@Table(name = "quote")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
