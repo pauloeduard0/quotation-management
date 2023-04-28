@@ -1,7 +1,6 @@
 package com.inatel.quotationmanagement.service;
 
 
-import com.inatel.quotationmanagement.exception.StockNotFoundException;
 import com.inatel.quotationmanagement.mapper.StockMapper;
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
 import com.inatel.quotationmanagement.model.entities.StockQuote;

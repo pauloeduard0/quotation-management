@@ -23,7 +23,7 @@ public class StockQuoteDto{
     private String stockId;
 
     @NotNull
-    private Map<LocalDate, BigDecimal> quotes = new HashMap<>();;
+    private Map<LocalDate, BigDecimal> quotes;
 }
 
 

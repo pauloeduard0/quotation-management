@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +13,8 @@ import org.springframework.http.HttpStatus;
 @Configuration
 public class Notification {
 
-    private String disclaimer;
-    private HttpStatus httpStatusCode;
-    private String message;
+    private String host;
+    private String port;
+
+
 }
