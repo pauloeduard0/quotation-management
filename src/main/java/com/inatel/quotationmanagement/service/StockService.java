@@ -20,16 +20,16 @@ import java.util.List;
 @Slf4j
 public class StockService {
 
-//    @Value("${server.host}")
-//    private String serverHost;
-//
-//    @Value("${server.port}")
-//    private String serverPort;
-//
-    @Value("${server.manager.host}")
+    //@Value("${server.host}")
+    private String serverHost;
+
+    //@Value("${server.port}")
+    private String serverPort;
+
+    //@Value("${server.manager.host}")
     private String stockManagerHost;
 
-    @Value("${server.manager.port}")
+    //@Value("${server.manager.port}")
     private String stockManagerPort;
 
     private String stockManagerBaseUrl;
@@ -58,27 +58,27 @@ public class StockService {
         log.info("Cache cleared");
     }
 
-//    public Notification[] registerOnStockManager() {
-//        try {
-//            log.info("Registering at {}", this.stockManagerBaseUrl);
-//            Notification notification = Notification.builder()
-//                    .host(this.serverHost)
-//                    .port(this.serverPort)
-//                    .build();
-//
-//            WebClient webClient = WebClient.builder().baseUrl("http://" + this.stockManagerHost + ":" + this.stockManagerPort).build();
-//
-//            return webClient.post()
-//                    .uri("/notification")
-//                    .body(BodyInserters.fromValue(notification))
-//                    .retrieve()
-//                    .bodyToMono(Notification[].class)
-//                    .block();
-//        } catch (WebClientException webClientException) {
-//            webClientException.printStackTrace();
-//            throw new StockManagerConnectionException(this.stockManagerBaseUrl);
-//        }
-//    }
+    public Notification[] registerOnStockManager() {
+        try {
+            log.info("Registering at {}", this.stockManagerBaseUrl);
+            Notification notification = Notification.builder()
+                    .host(this.serverHost)
+                    .port(this.serverPort)
+                    .build();
+
+            WebClient webClient = WebClient.builder().baseUrl("http://" + this.stockManagerHost + ":" + this.stockManagerPort).build();
+
+            return webClient.post()
+                    .uri("/notification")
+                    .body(BodyInserters.fromValue(notification))
+                    .retrieve()
+                    .bodyToMono(Notification[].class)
+                    .block();
+        } catch (WebClientException webClientException) {
+            webClientException.printStackTrace();
+            throw new StockManagerConnectionException(this.stockManagerBaseUrl);
+        }
+    }
 
 
 }
