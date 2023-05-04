@@ -1,29 +1,24 @@
 package com.inatel.quotationmanagement.model.dto;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class StockQuoteDto{
-    private UUID id;
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public record StockQuoteDto(
+        @JsonProperty("id") UUID id,
+        @JsonProperty("stockId") String stockId,
+        @JsonProperty("quotes") Map<LocalDate, BigDecimal> quotes) {
 
-    @NotNull
-    private String stockId;
-
-    @NotNull
-    private Map<LocalDate, BigDecimal> quotes;
+    public StockQuoteDto {
+        Objects.requireNonNull(stockId, "stockId cannot be null");
+        Objects.requireNonNull(quotes, "quotes cannot be null");
+    }
 }
 
 

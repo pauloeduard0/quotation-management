@@ -4,28 +4,31 @@ import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
 import com.inatel.quotationmanagement.model.entities.Quote;
 import com.inatel.quotationmanagement.model.entities.StockQuote;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StockMapper {
     public static List<StockQuote> toStockQuoteList(List<StockQuoteDto> stockQuoteDTOList) {
-        return stockQuoteDTOList.stream().map(stockQuoteDto -> toStockQuote(stockQuoteDto)).collect(Collectors.toList());
+        return stockQuoteDTOList.stream().map(StockMapper::toStockQuote).collect(Collectors.toList());
     }
 
     public static List<StockQuoteDto> toStockQuoteDtoList(List<StockQuote> stockQuoteList) {
-        return stockQuoteList.stream().map(stockQuote -> toStockQuoteDto(stockQuote)).collect(Collectors.toList());
+        return stockQuoteList.stream().map(StockMapper::toStockQuoteDto).collect(Collectors.toList());
     }
 
     public static StockQuote toStockQuote(StockQuoteDto stockQuoteDto) {
+        UUID id = stockQuoteDto.id();
+        String stockId = stockQuoteDto.stockId();
+
         StockQuote stockQuote = StockQuote.builder()
-                .id(stockQuoteDto.getId())
-                .stockId(stockQuoteDto.getStockId())
+                .id(id)
+                .stockId(stockId)
                 .quotes(new ArrayList<>())
                 .build();
 
-        stockQuoteDto.getQuotes().entrySet().stream().forEach(quoteEntry -> stockQuote.addQuote(Quote.builder()
+        stockQuoteDto.quotes().entrySet().stream().forEach(quoteEntry -> stockQuote.addQuote(Quote.builder()
                 .date(quoteEntry.getKey())
                 .value(quoteEntry.getValue())
                 .build()));
@@ -34,17 +37,16 @@ public class StockMapper {
     }
 
     public static StockQuoteDto toStockQuoteDto(StockQuote stockQuote) {
-        StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
-                .id(stockQuote.getId())
-                .stockId(stockQuote.getStockId())
-                .quotes(new HashMap<>())
-                .build();
+        Map<LocalDate, BigDecimal> quotes = stockQuote.getQuotes().stream()
+                .collect(Collectors.toMap(Quote::getDate, Quote::getValue));
 
-        stockQuoteDto.setQuotes(stockQuote.getQuotes().stream()
-                .collect(Collectors.toMap(Quote::getDate, Quote::getValue)));
-
-        return stockQuoteDto;
+        return new StockQuoteDto(
+                stockQuote.getId(),
+                stockQuote.getStockId(),
+                quotes
+        );
     }
+
 
 }
 

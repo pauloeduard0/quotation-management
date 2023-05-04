@@ -22,63 +22,43 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(StockNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public Error stockNotFoundException(StockNotFoundException stockNotFoundException){
-        return Error.builder()
-                .httpStatusCode(HttpStatus.NOT_FOUND)
-                .message(stockNotFoundException.getMessage())
-                .build();
+        return new Error("Stock não encontrada para registro", HttpStatus.NOT_FOUND, stockNotFoundException.getMessage());
     }
 
     @ExceptionHandler(StockManagerConnectionException.class)
     @ResponseStatus(value = HttpStatus.SERVICE_UNAVAILABLE)
     public Error stockManagerConnectionException(StockManagerConnectionException stockManagerConnectionException){
-        return Error.builder()
-                .httpStatusCode(HttpStatus.SERVICE_UNAVAILABLE)
-                .message(stockManagerConnectionException.getMessage())
-                .build();
+        return new Error("Conexão Stock Manager Error", HttpStatus.NOT_FOUND, stockManagerConnectionException.getMessage());
     }
 
     @ExceptionHandler(InvalidFormatException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public Error invalidFormatExcepetion(InvalidFormatException invalidFormatException){
-        return Error.builder()
-                .httpStatusCode(HttpStatus.BAD_REQUEST)
-                .message(invalidFormatException.getMessage())
-                .build();
+    public Error invalidFormatException(InvalidFormatException invalidFormatException){
+        return new Error("Formato Invalido", HttpStatus.NOT_FOUND, invalidFormatException.getMessage());
     }
 
     @ExceptionHandler(JsonMappingException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public Error jsonMappingException(JsonMappingException jsonMappingException){
-        return Error.builder()
-                .httpStatusCode(HttpStatus.BAD_REQUEST)
-                .message(jsonMappingException.getMessage())
-                .build();
+        return new Error("Exceção Mapeamento Json", HttpStatus.NOT_FOUND, jsonMappingException.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public Error methodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException){
-        return Error.builder()
-                .httpStatusCode(HttpStatus.BAD_REQUEST)
-                .message(methodArgumentNotValidException.getMessage())
-                .build();
+        return new Error("Método Argumento não é válido", HttpStatus.NOT_FOUND, methodArgumentNotValidException.getMessage());
     }
 
     @ExceptionHandler(JDBCConnectionException.class)
     @ResponseStatus(value = HttpStatus.SERVICE_UNAVAILABLE)
     public Error jDBCConnectionException(JDBCConnectionException jDBCConnectionException){
-        return Error.builder()
-                .httpStatusCode(HttpStatus.SERVICE_UNAVAILABLE)
-                .message(jDBCConnectionException.getMessage())
-                .build();
+        return new Error("Exceção de Conexão do JDBC", HttpStatus.NOT_FOUND, jDBCConnectionException.getMessage());
     }
 
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public Error nullPointerException(NullPointerException nullPointerException){
-        return Error.builder()
-                .httpStatusCode(HttpStatus.INTERNAL_SERVER_ERROR)
-                .message(nullPointerException.getMessage())
-                .build();
+        return new Error("Exceção Null Pointer", HttpStatus.NOT_FOUND, nullPointerException.getMessage());
     }
+
 }
