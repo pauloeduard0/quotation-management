@@ -20,16 +20,16 @@ import java.util.List;
 @Slf4j
 public class StockService {
 
-    //@Value("${server.host}")
+    @Value("${server.host}")
     private String serverHost;
 
-    //@Value("${server.port}")
+    @Value("${server.port}")
     private String serverPort;
 
-    //@Value("${server.manager.host}")
+    @Value("${server.manager.host}")
     private String stockManagerHost;
 
-    //@Value("${server.manager.port}")
+    @Value("${server.manager.port}")
     private String stockManagerPort;
 
     private String stockManagerBaseUrl;

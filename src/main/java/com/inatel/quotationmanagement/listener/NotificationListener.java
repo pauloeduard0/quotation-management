@@ -20,12 +20,12 @@ public class NotificationListener implements ApplicationListener<ApplicationRead
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-//        Notification[] notificationList = stockService.registerOnStockManager();
-//
-//        String response = Stream.of(notificationList).map(notification -> String.format("%s:%s", notification.getHost(), notification.getPort()))
-//                .reduce((n1, n2) -> String.format("%s,%s", n1, n2))
-//                .orElse("");
-//        log.info("Response: {}", String.format("[%s]", response));
+        Notification[] notificationList = stockService.registerOnStockManager();
+
+        String response = Stream.of(notificationList).map(notification -> String.format("%s:%s", notification.getHost(), notification.getPort()))
+                .reduce((n1, n2) -> String.format("%s,%s", n1, n2))
+                .orElse("");
+        log.info("Response: {}", String.format("[%s]", response));
     }
 
 }
