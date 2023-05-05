@@ -1,58 +1,58 @@
-version: "3.3"
-
-services:
-  mysql:
-    image: mysql
-    container_name: mysql
-    ports:
-      - 3306:3306
-      - 33060:33060
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=bootdb
-    networks:
-      - inatel
-
-  stock-manager:
-    image: adautomendes/stock-manager
-    container_name: stock-manager
-    ports:
-      - 8080:8080
-    environment:
-      - SERVER_HOST = stock-manager
-      - SERVER_PORT = 8080
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - SPRING_PROFILES_ACTIVE=prod
-    depends_on:
-      - mysql
-    networks:
-      - inatel
-
-  quotation-management:
-    build:
-      dockerfile: ./Dockerfile
-      context: ./
-      args:
-        JAR_FILE: target/quotation-management-0.0.1-SNAPSHOT.jar
-    image: adautomendes/quotation-management
-    container_name: quotation-management
-    ports:
-      - 8081:8081
-    environment:
-      - SERVER_HOST=quotation-management
-      - SERVER_PORT=8081
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - STOCK_MANAGER_HOST=stock-manager
-      - STOCK_MANAGER_PORT=8080
-      - SPRING_PROFILES_ACTIVE=prod
-    depends_on:
-      - stock-manager
-      - mysql
-    networks:
-      - inatel
-
-networks:
-  inatel:
-    driver: bridge
+#version: "3.3"
+#
+#services:
+#  mysql:
+#    image: mysql
+#    container_name: mysql
+#    ports:
+#      - 3306:3306
+#      - 33060:33060
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=root
+#      - MYSQL_DATABASE=bootdb
+#    networks:
+#      - inatel
+#
+#  stock-manager:
+#    image: adautomendes/stock-manager
+#    container_name: stock-manager
+#    ports:
+#      - 8080:8080
+#    environment:
+#      - SERVER_HOST = stock-manager
+#      - SERVER_PORT = 8080
+#      - MYSQL_HOST=mysql
+#      - MYSQL_PORT=3306
+#      - SPRING_PROFILES_ACTIVE=prod
+#    depends_on:
+#      - mysql
+#    networks:
+#      - inatel
+#
+#  quotation-management:
+#    build:
+#      dockerfile: ./Dockerfile
+#      context: ./
+#      args:
+#        JAR_FILE: target/quotation-management-0.0.1-SNAPSHOT.jar
+#    image: adautomendes/quotation-management
+#    container_name: quotation-management
+#    ports:
+#      - 8081:8081
+#    environment:
+#      - SERVER_HOST=quotation-management
+#      - SERVER_PORT=8081
+#      - MYSQL_HOST=mysql
+#      - MYSQL_PORT=3306
+#      - STOCK_MANAGER_HOST=stock-manager
+#      - STOCK_MANAGER_PORT=8080
+#      - SPRING_PROFILES_ACTIVE=prod
+#    depends_on:
+#      - stock-manager
+#      - mysql
+#    networks:
+#      - inatel
+#
+#networks:
+#  inatel:
+#    driver: bridge

@@ -27,25 +27,23 @@ public class StockQuoteService {
 
         StockQuote stockQuote = StockMapper.toStockQuote(stockQuoteDto);
 
-        if (isStockValid(stockQuote)){
+        if (isStockValid(stockQuote)) {
             return StockMapper.toStockQuoteDto(stockRepository.save(stockQuote));
         }
         throw new StockNotFoundException(stockQuote);
     }
 
     private boolean isStockValid(StockQuote stockQuote) {
-        return stockService.getAllStock().stream().anyMatch(stock -> stock.getId().equals(stockQuote.getStockId()));
+        return stockService.getAllStock().stream().anyMatch(stock -> stock.id().equals(stockQuote.getStockId()));
     }
 
-    public List<StockQuoteDto> getStockQuoteByStockId(String stockId)
-    {
+    public List<StockQuoteDto> getStockQuoteByStockId(String stockId) {
         return StockMapper.toStockQuoteDtoList(stockRepository.findByStockId(stockId));
     }
 
-    public List<StockQuoteDto> getAllStockQuote(){
+    public List<StockQuoteDto> getAllStockQuote() {
         return StockMapper.toStockQuoteDtoList(stockRepository.findAll());
     }
-
 
 
 }

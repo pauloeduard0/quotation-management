@@ -66,7 +66,7 @@ public class StockService {
                     .port(this.serverPort)
                     .build();
 
-            WebClient webClient = WebClient.builder().baseUrl("http://" + this.stockManagerHost + ":" + this.stockManagerPort).build();
+            webClient = WebClient.builder().baseUrl("http://" + this.stockManagerHost + ":" + this.stockManagerPort).build();
 
             return webClient.post()
                     .uri("/notification")
