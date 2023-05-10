@@ -1,6 +1,7 @@
 package com.inatel.quotationmanagement.service;
 
 
+import com.inatel.quotationmanagement.adapter.StockAdapter;
 import com.inatel.quotationmanagement.exception.StockNotFoundException;
 import com.inatel.quotationmanagement.mapper.StockMapper;
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
@@ -18,7 +19,7 @@ import java.util.List;
 public class StockQuoteService {
 
     @Autowired
-    private StockService stockService;
+    private StockAdapter stockAdapter;
 
     @Autowired
     private StockRepository stockRepository;
@@ -34,7 +35,7 @@ public class StockQuoteService {
     }
 
     private boolean isStockValid(StockQuote stockQuote) {
-        return stockService.getAllStock().stream().anyMatch(stock -> stock.id().equals(stockQuote.getStockId()));
+        return stockAdapter.getAllStock().stream().anyMatch(stock -> stock.id().equals(stockQuote.getStockId()));
     }
 
     public List<StockQuoteDto> getStockQuoteByStockId(String stockId) {

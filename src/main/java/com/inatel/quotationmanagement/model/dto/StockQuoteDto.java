@@ -1,6 +1,7 @@
 package com.inatel.quotationmanagement.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@Builder
 public record StockQuoteDto(UUID id, String stockId, Map<LocalDate, BigDecimal> quotes) {
 
     public StockQuoteDto {

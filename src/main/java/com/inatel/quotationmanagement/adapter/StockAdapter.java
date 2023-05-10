@@ -1,4 +1,4 @@
-package com.inatel.quotationmanagement.service;
+package com.inatel.quotationmanagement.adapter;
 
 import com.inatel.quotationmanagement.exception.StockManagerConnectionException;
 import com.inatel.quotationmanagement.model.rest.Notification;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class StockService {
+public class StockAdapter {
 
     @Value("${server.host}")
     private String serverHost;
