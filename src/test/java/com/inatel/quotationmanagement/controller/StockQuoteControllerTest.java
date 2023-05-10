@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class StockQuoteControllerTest {
+class StockQuoteControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,7 +34,24 @@ public class StockQuoteControllerTest {
     ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Test
-    public void testGetQuotes_ReturnsAllStockQuotes() throws Exception {
+    void testGetQuotes_ReturnsStockQuotesByStockId() throws Exception {
+
+        String stockId = "petr4";
+
+        final MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/quote")
+                        .param("stockId", stockId))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        final String responseBody = mvcResult.getResponse().getContentAsString();
+        final List<StockQuoteDto> stockQuotes = mapper.readValue(responseBody, new TypeReference<List<StockQuoteDto>>() {
+        });
+
+        assertThat(stockQuotes).isNotEmpty();
+    }
+
+    @Test
+    void testGetQuotes_ReturnsAllStockQuotes() throws Exception {
         final MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/quote"))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -44,11 +61,10 @@ public class StockQuoteControllerTest {
         });
 
         assertThat(stockQuotes).isNotEmpty();
-
     }
 
     @Test
-    public void testCreateNewStockQuote_ReturnsCorrectJson() throws Exception {
+    void testCreateNewStockQuote_ReturnsCorrectJson() throws Exception {
         final StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
                 .stockId("petr4")
                 .quotes(Collections.singletonMap(LocalDate.now(), BigDecimal.valueOf(20L)))

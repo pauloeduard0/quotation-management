@@ -57,10 +57,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(WebExchangeBindException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ProblemDetail handleWebExchangeBindExceptionn(WebExchangeBindException e) {
+    public ProblemDetail handleWebExchangeBindException(WebExchangeBindException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
         problemDetail.setTitle("Web Exchange Bind Exception");
-        problemDetail.setType(URI.create("https://api.bookmarks.com/errors/method-argument-not-nalid-nxception"));
+        problemDetail.setType(URI.create("https://api.bookmarks.com/errors/web-exchange-bind-exception"));
         return problemDetail;
     }
 
