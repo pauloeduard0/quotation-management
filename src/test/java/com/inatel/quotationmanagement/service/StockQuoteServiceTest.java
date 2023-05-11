@@ -35,15 +35,13 @@ class StockQuoteServiceTest {
 
     @Test
     void testSaveStockQuote_ValidStock_ReturnsStockQuoteDto() {
-        UUID id = UUID.randomUUID();
-        String stockId = "petr4";
-        Map<LocalDate, BigDecimal> quotes1 = new HashMap<>();
-        quotes1.put(LocalDate.of(2023, 5, 9), BigDecimal.valueOf(23.0));
-        quotes1.put(LocalDate.of(2023, 5, 10), BigDecimal.valueOf(24.0));
 
-        StockQuoteDto stockQuoteDto = new StockQuoteDto(id, stockId, quotes1);
+        final StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
+                .stockId("petr4")
+                .quotes(Collections.singletonMap(LocalDate.now(), BigDecimal.valueOf(20L)))
+                .build();
 
-        Stock stock = Stock.builder()
+        final Stock stock = Stock.builder()
                 .id("petr4")
                 .description("Stock petr4")
                 .build();
@@ -55,19 +53,17 @@ class StockQuoteServiceTest {
         StockQuoteDto result = stockQuoteService.saveStockQuote(stockQuoteDto);
 
         assertNotNull(result);
-        assertEquals(id, result.id());
-        assertEquals(stockId, result.stockId());
-        assertEquals(quotes1.size(), result.quotes().size());
-        assertTrue(result.quotes().containsKey(LocalDate.of(2023, 5, 9)));
-        assertEquals(BigDecimal.valueOf(23.0), result.quotes().get(LocalDate.of(2023, 5, 9)));
-        assertTrue(result.quotes().containsKey(LocalDate.of(2023, 5, 10)));
-        assertEquals(BigDecimal.valueOf(24.0), result.quotes().get(LocalDate.of(2023, 5, 10)));
+        assertEquals(stockQuoteDto.id(), result.id());
+        assertEquals(stockQuoteDto.stockId(), result.stockId());
+        assertEquals(stockQuoteDto.quotes().size(), result.quotes().size());
+        assertTrue(result.quotes().containsKey(LocalDate.now()));
+        assertEquals(BigDecimal.valueOf(20L), result.quotes().get(LocalDate.now()));
     }
 
 
     @Test
     void testSaveStockQuote_InvalidStock_ThrowsStockNotFoundException() {
-        StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
+        final StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
                 .id(UUID.randomUUID())
                 .stockId("petr4")
                 .quotes(Collections.emptyMap())
@@ -78,5 +74,69 @@ class StockQuoteServiceTest {
             stockQuoteService.saveStockQuote(stockQuoteDto);
         });
     }
+
+    @Test
+    void testGetStockQuoteByStockId_ValidStockId_ReturnsStockQuoteDtoList() {
+        // Arrange
+        String stockId = "petr4";
+        final StockQuote stockQuote1 = StockQuote.builder()
+                .id(UUID.randomUUID())
+                .stockId(stockId)
+                .quotes(Collections.emptyList())
+                .build();
+        final StockQuote stockQuote2 = StockQuote.builder()
+                .id(UUID.randomUUID())
+                .stockId(stockId)
+                .quotes(Collections.emptyList())
+                .build();
+        List<StockQuote> stockQuotes = Arrays.asList(stockQuote1, stockQuote2);
+
+        when(stockRepository.findByStockId(stockId)).thenReturn(stockQuotes);
+
+        List<StockQuoteDto> result = stockQuoteService.getStockQuoteByStockId(stockId);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        result.forEach(stockQuoteDto -> assertEquals(stockId, stockQuoteDto.stockId()));
+
+        result.forEach(stockQuoteDto -> {
+            assertNotNull(stockQuoteDto.id());
+            assertNotNull(stockQuoteDto.quotes());
+        });
+    }
+
+    @Test
+    void testGetAllStockQuote_ReturnsStockQuoteDtoList() {
+        final StockQuote stockQuote1 = StockQuote.builder()
+                .id(UUID.randomUUID())
+                .stockId("petr4")
+                .quotes(Collections.emptyList())
+                .build();
+        final StockQuote stockQuote2 = StockQuote.builder()
+                .id(UUID.randomUUID())
+                .stockId("aapl34")
+                .quotes(Collections.emptyList())
+                .build();
+        List<StockQuote> stockQuotes = Arrays.asList(stockQuote1, stockQuote2);
+
+        when(stockRepository.findAll()).thenReturn(stockQuotes);
+
+        List<StockQuoteDto> result = stockQuoteService.getAllStockQuote();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        StockQuoteDto stockQuoteDto1 = result.get(0);
+        assertEquals(stockQuote1.getId(), stockQuoteDto1.id());
+        assertEquals(stockQuote1.getStockId(), stockQuoteDto1.stockId());
+        assertEquals(stockQuote1.getQuotes().size(), stockQuoteDto1.quotes().size());
+
+        StockQuoteDto stockQuoteDto2 = result.get(1);
+        assertEquals(stockQuote2.getId(), stockQuoteDto2.id());
+        assertEquals(stockQuote2.getStockId(), stockQuoteDto2.stockId());
+        assertEquals(stockQuote2.getQuotes().size(), stockQuoteDto2.quotes().size());
+    }
+
 }
 
