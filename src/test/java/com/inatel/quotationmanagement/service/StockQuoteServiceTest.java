@@ -77,7 +77,7 @@ class StockQuoteServiceTest {
 
     @Test
     void testGetStockQuoteByStockId_ValidStockId_ReturnsStockQuoteDtoList() {
-        // Arrange
+
         String stockId = "petr4";
         final StockQuote stockQuote1 = StockQuote.builder()
                 .id(UUID.randomUUID())
