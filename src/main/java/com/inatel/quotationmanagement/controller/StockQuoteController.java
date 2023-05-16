@@ -6,11 +6,12 @@ import com.inatel.quotationmanagement.service.StockQuoteService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/quote")
@@ -21,23 +22,19 @@ public class StockQuoteController {
     private StockQuoteService stockQuoteService;
 
     @GetMapping
-    public ResponseEntity<List<StockQuoteDto>> getQuotes(@RequestParam(required = false) Optional<String> stockId)
-    {
-        List<StockQuoteDto> stockQuoteList;
-        if(stockId.isPresent())
-        {
-            stockQuoteList = stockQuoteService.getStockQuoteByStockId(stockId.get());
-        }
-        else
-        {
-            stockQuoteList = stockQuoteService.getAllStockQuote();
-        }
-        return ResponseEntity.ok(stockQuoteList);
+    public ResponseEntity<Page<StockQuoteDto>> getAllQuotes(@PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(stockQuoteService.getAllStockQuote(pageable));
     }
 
+    @GetMapping
+    @RequestMapping("/{stockId}")
+    public ResponseEntity<Page<StockQuoteDto>> getQuotes(@PathVariable String stockId, @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(stockQuoteService.getStockQuoteByStockId(stockId, pageable));
+    }
+
+    @Transactional
     @PostMapping
-    public ResponseEntity<StockQuoteDto> saveQuote(@Valid @RequestBody StockQuoteDto stockQuoteDto)
-    {
+    public ResponseEntity<StockQuoteDto> saveQuote(@Valid @RequestBody StockQuoteDto stockQuoteDto) {
         return ResponseEntity.created(null).body(stockQuoteService.saveStockQuote(stockQuoteDto));
     }
 

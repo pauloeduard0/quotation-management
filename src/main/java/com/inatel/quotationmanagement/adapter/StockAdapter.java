@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClientException;
 import java.util.Arrays;
 import java.util.List;
 
+@EnableCaching
 @Service
 @Slf4j
 public class StockAdapter {
@@ -43,7 +45,7 @@ public class StockAdapter {
                 .build();
     }
 
-    @Cacheable(cacheNames = "stock")
+    @Cacheable("stock")
     public List<Stock> getAllStock() {
         try {
             Stock[] stockArr = this.webClient.get().uri("/stock").retrieve().bodyToMono(Stock[].class).block();
@@ -53,7 +55,7 @@ public class StockAdapter {
         }
     }
 
-    @CacheEvict(cacheNames = "stock")
+    @CacheEvict("stock")
     public void clearStockCache() {
         log.info("Cache cleared");
     }

@@ -1,6 +1,5 @@
 package com.inatel.quotationmanagement.service;
 
-
 import com.inatel.quotationmanagement.adapter.StockAdapter;
 import com.inatel.quotationmanagement.exception.StockNotFoundException;
 import com.inatel.quotationmanagement.mapper.StockMapper;
@@ -9,10 +8,9 @@ import com.inatel.quotationmanagement.model.entities.StockQuote;
 import com.inatel.quotationmanagement.repository.StockRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-
 
 @Service
 @Slf4j
@@ -38,12 +36,12 @@ public class StockQuoteService {
         return stockAdapter.getAllStock().stream().anyMatch(stock -> stock.id().equals(stockQuote.getStockId()));
     }
 
-    public List<StockQuoteDto> getStockQuoteByStockId(String stockId) {
-        return StockMapper.toStockQuoteDtoList(stockRepository.findByStockId(stockId));
+    public Page<StockQuoteDto> getStockQuoteByStockId(String stockId, Pageable pageable) {
+        return stockRepository.findByStockId(stockId, pageable).map(StockMapper::toStockQuoteDto);
     }
 
-    public List<StockQuoteDto> getAllStockQuote() {
-        return StockMapper.toStockQuoteDtoList(stockRepository.findAll());
+    public Page<StockQuoteDto> getAllStockQuote(Pageable pageable) {
+        return stockRepository.findAll(pageable).map(StockMapper::toStockQuoteDto);
     }
 
 
