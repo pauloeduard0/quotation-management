@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StockMapperTest {
 
     @Test
-    void testToStockQuoteList() {
+    void givenStockQuoteDtoList_whenConvertToStockQuoteList_thenSizeShouldBeEqual() {
         List<StockQuoteDto> stockQuoteDtoList = new ArrayList<>();
 
         final StockQuoteDto stockQuoteDto1 = StockQuoteDto.builder()
@@ -38,7 +38,7 @@ class StockMapperTest {
     }
 
     @Test
-    void testToStockQuoteDtoList() {
+    void givenStockQuoteList_whenConvertToStockQuoteDtoList_thenAllFieldsShouldBeEqual() {
         List<StockQuote> stockQuoteList = new ArrayList<>();
 
         StockQuote stockQuote1 = StockQuote.builder()
@@ -92,7 +92,7 @@ class StockMapperTest {
     }
 
     @Test
-    void testToStockQuote() {
+    void givenStockQuoteDto_whenConvertToStockQuote_thenAllFieldsShouldBeEqual() {
         final StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
                 .id(UUID.randomUUID())
                 .stockId("petr4")
@@ -111,7 +111,7 @@ class StockMapperTest {
     }
 
     @Test
-    void testToStockQuoteDto() {
+    void givenStockQuote_whenConvertToStockQuoteDto_thenAllFieldsShouldBeEqual() {
 
         StockQuote stockQuote = StockQuote.builder()
                 .id(UUID.randomUUID())

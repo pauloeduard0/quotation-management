@@ -1,89 +1,99 @@
 package com.inatel.quotationmanagement.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
-import org.json.JSONObject;
+import com.inatel.quotationmanagement.service.StockQuoteService;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
 import java.util.Collections;
-import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(StockQuoteController.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 class StockQuoteControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    @MockBean
+    private StockQuoteService stockQuoteService;
 
-    @Test
-    void testGetQuotes_ReturnsStockQuotesByStockId() throws Exception {
+    @BeforeEach
+    public void setUp() {
 
-        String stockId = "petr4";
-
-        final MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/quote")
-                        .param("stockId", stockId))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        final String responseBody = mvcResult.getResponse().getContentAsString();
-        final List<StockQuoteDto> stockQuotes = mapper.readValue(responseBody, new TypeReference<List<StockQuoteDto>>() {
-        });
-
-        assertThat(stockQuotes).isNotEmpty();
     }
 
     @Test
-    void testGetQuotes_ReturnsAllStockQuotes() throws Exception {
-        final MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/quote"))
-                .andExpect(status().isOk())
-                .andReturn();
+    void givenNoParameters_whenGetAllStockQuote_thenReturnHttpStatus200AndEmptyStockQuoteDtoList() throws Exception {
 
-        final String responseBody = mvcResult.getResponse().getContentAsString();
-        final List<StockQuoteDto> stockQuotes = mapper.readValue(responseBody, new TypeReference<List<StockQuoteDto>>() {
-        });
+        Mockito.when(stockQuoteService.getAllStockQuote(Mockito.any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        assertThat(stockQuotes).isNotEmpty();
+        mockMvc.perform(MockMvcRequestBuilders.get("/quote")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content.length()").value(0));
     }
 
     @Test
-    void testCreateNewStockQuote_ReturnsCorrectJson() throws Exception {
-        final StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
+    void givenStockId_whenGetQuotes_thenReturnHttpStatus200AndEmptyStockQuoteDtoList() throws Exception {
+
+        Mockito.when(stockQuoteService.getStockQuoteByStockId(Mockito.eq("petr4"), Mockito.any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.emptyList()));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/quote/{stockId}", "petr4")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content.length()").value(0));
+    }
+
+    @Test
+    void givenStockQuoteDto_whenSaveQuote_thenReturnHttpStatus201AndSavedStockQuoteDto() throws Exception {
+
+        StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
                 .stockId("petr4")
                 .quotes(Collections.singletonMap(LocalDate.now(), BigDecimal.valueOf(20L)))
                 .build();
-        final MvcResult mvcResult = mockMvc.perform(
-                        MockMvcRequestBuilders.post("/quote")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(stockQuoteDto)))
-                .andExpect(status().isCreated())
-                .andReturn();
-        JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
-        final String id = jsonObject.getString("id");
-        assertThat(id).isNotNull().isInstanceOf(String.class);
-        final String stockId = jsonObject.getString("stockId");
-        assertThat(stockId).isEqualTo(stockQuoteDto.stockId());
-        final JSONObject quotes = jsonObject.getJSONObject("quotes");
-        assertThat(quotes.length()).isEqualTo(1);
-        final BigDecimal quoteValue = new BigDecimal(quotes.getString(LocalDate.now().toString()));
-        assertThat(quoteValue).isEqualTo(stockQuoteDto.quotes().get(LocalDate.now()));
+        Mockito.when(stockQuoteService.saveStockQuote(Mockito.any(StockQuoteDto.class)))
+                .thenReturn(stockQuoteDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/quote")
+                        .content("{ \"stockId\": \"petr4\", \"quotes\": { \"2023-05-15\": 20 } }")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.stockId").value("petr4"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.quotes").isNotEmpty());
     }
 
+    @Test
+    void givenInvalidFormatStockQuoteDto_whenSaveQuote_thenReturnHttpStatus400() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/quote")
+                        .content("{ \"stockId\": \"Petr4\", \"quotes\": { \"2023-05-15\": \"invalid\" } }")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
 }
