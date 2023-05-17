@@ -1,5 +1,0 @@
-CREATE TABLE stock_quote (
-id BINARY(16) NOT NULL,
-stock_id VARCHAR(255) NOT NULL,
-PRIMARY KEY (id)
-);
