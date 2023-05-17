@@ -4,6 +4,7 @@ services:
   mysql:
     image: mysql
     container_name: mysql
+    restart: always
     ports:
       - 3306:3306
       - 33060:33060
@@ -11,13 +12,14 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=bootdb
     volumes:
-      - /c/Users/Paulera/Documents/Trampo Inatel/Projeto 1/quotation-management/.init/create-database.sql
+      - ./init:/docker-entrypoint-initdb.d
     networks:
       - inatel
 
   stock-manager:
     image: adautomendes/stock-manager
     container_name: stock-manager
+    restart: always
     ports:
       - 8080:8080
     depends_on:
@@ -33,6 +35,7 @@ services:
         JAR_FILE: target/quotation-management-0.0.1-SNAPSHOT.jar
     image: quotation-management
     container_name: quotation-management
+    restart: always
     ports:
       - 8081:8081
     environment:

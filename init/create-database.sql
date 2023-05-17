@@ -13,6 +13,7 @@ primary key(id)
 );
 
 CREATE DATABASE IF NOT EXISTS bootdb_test;
+USE bootdb_test;
 
 CREATE TABLE IF NOT EXISTS stock_quote (
 id BINARY(16) NOT NULL,
