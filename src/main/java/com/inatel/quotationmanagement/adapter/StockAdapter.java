@@ -48,8 +48,8 @@ public class StockAdapter {
     @Cacheable("stock")
     public List<Stock> getAllStock() {
         try {
-            Stock[] stockArr = this.webClient.get().uri("/stock").retrieve().bodyToMono(Stock[].class).block();
-            return Arrays.asList(stockArr);
+            Stock[] stock = this.webClient.get().uri("/stock").retrieve().bodyToMono(Stock[].class).block();
+            return Arrays.asList(stock);
         } catch (WebClientException webClientException) {
             throw new StockManagerConnectionException(this.stockManagerBaseUrl);
         }
@@ -81,6 +81,5 @@ public class StockAdapter {
             throw new StockManagerConnectionException(this.stockManagerBaseUrl);
         }
     }
-
-
+    
 }

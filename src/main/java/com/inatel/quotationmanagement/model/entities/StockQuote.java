@@ -18,7 +18,8 @@ import java.util.UUID;
 @Data
 public class StockQuote {
 
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String stockId;
 
@@ -30,4 +31,5 @@ public class StockQuote {
         quotes.add(quote);
         quote.setStockQuote(this);
     }
+
 }

@@ -32,10 +32,6 @@ public class StockQuoteService {
         throw new StockNotFoundException(stockQuote);
     }
 
-    private boolean isStockValid(StockQuote stockQuote) {
-        return stockAdapter.getAllStock().stream().anyMatch(stock -> stock.id().equals(stockQuote.getStockId()));
-    }
-
     public Page<StockQuoteDto> getStockQuoteByStockId(String stockId, Pageable pageable) {
         return stockRepository.findByStockId(stockId, pageable).map(StockMapper::toStockQuoteDto);
     }
@@ -44,7 +40,8 @@ public class StockQuoteService {
         return stockRepository.findAll(pageable).map(StockMapper::toStockQuoteDto);
     }
 
+    private boolean isStockValid(StockQuote stockQuote) {
+        return stockAdapter.getAllStock().stream().anyMatch(stock -> stock.id().equals(stockQuote.getStockId()));
+    }
 
 }
-
-

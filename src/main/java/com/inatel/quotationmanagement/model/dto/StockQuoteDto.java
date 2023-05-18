@@ -31,7 +31,5 @@ public record StockQuoteDto(
         Objects.requireNonNull(stockId, "stockId cannot be null");
         Objects.requireNonNull(quotes, "quotes cannot be null");
     }
+
 }
-
-
-

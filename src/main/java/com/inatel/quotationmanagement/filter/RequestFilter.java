@@ -21,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 @Slf4j
 public class RequestFilter extends OncePerRequestFilter {
 
-    private final boolean includeResponsePayload = true;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
@@ -30,21 +29,23 @@ public class RequestFilter extends OncePerRequestFilter {
         filterChain.doFilter(requestWrapper, responseWrapper);
 
         String requestBody = this.getContentAsString(requestWrapper.getContentAsByteArray(), request.getCharacterEncoding());
-        if (requestBody.length() > 0){
+        if (requestBody.length() > 0) {
             log.info("Request body:\n{}", requestBody);
         }
 
         String responseBody = this.getContentAsString(responseWrapper.getContentAsByteArray(), response.getCharacterEncoding());
-        if (responseBody.length() > 0 && includeResponsePayload){
+        boolean includeResponsePayload = true;
+        if (responseBody.length() > 0 && includeResponsePayload) {
             log.info("Response body:\n{}", responseBody);
         }
         responseWrapper.copyBodyToResponse();
     }
 
     private String getContentAsString(byte[] contentAsByteArray, String characterEncoding) throws UnsupportedEncodingException {
-        if(contentAsByteArray == null || contentAsByteArray.length == 0){
+        if (contentAsByteArray == null || contentAsByteArray.length == 0) {
             return "";
         }
         return new String(contentAsByteArray, 0, contentAsByteArray.length, characterEncoding);
     }
+
 }

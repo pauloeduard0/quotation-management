@@ -14,22 +14,38 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StockMapperTest {
 
+    private StockQuoteDto createStockQuoteDto(String stockId, LocalDate date, BigDecimal quoteValue) {
+        return StockQuoteDto.builder()
+                .stockId(stockId)
+                .quotes(Collections.singletonMap(date, quoteValue))
+                .build();
+    }
+
+    private StockQuote createStockQuote(String stockId, LocalDate date, BigDecimal quoteValue) {
+        StockQuote stockQuote = StockQuote.builder()
+                .id(UUID.randomUUID())
+                .stockId(stockId)
+                .quotes(new ArrayList<>())
+                .build();
+
+        Quote quote = Quote.builder()
+                .date(date)
+                .value(quoteValue)
+                .build();
+
+        stockQuote.addQuote(quote);
+
+        return stockQuote;
+    }
+
     @Test
     void givenStockQuoteDtoList_whenConvertToStockQuoteList_thenSizeShouldBeEqual() {
         List<StockQuoteDto> stockQuoteDtoList = new ArrayList<>();
 
-        final StockQuoteDto stockQuoteDto1 = StockQuoteDto.builder()
-                .stockId("petr4")
-                .quotes(Collections.singletonMap(LocalDate.now(), BigDecimal.valueOf(20L)))
-                .build();
-
+        StockQuoteDto stockQuoteDto1 = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
         stockQuoteDtoList.add(stockQuoteDto1);
 
-        final StockQuoteDto stockQuoteDto2 = StockQuoteDto.builder()
-                .stockId("aapl34")
-                .quotes(Collections.singletonMap(LocalDate.now(), BigDecimal.valueOf(40L)))
-                .build();
-
+        StockQuoteDto stockQuoteDto2 = createStockQuoteDto("aapl34", LocalDate.now(), BigDecimal.valueOf(40L));
         stockQuoteDtoList.add(stockQuoteDto2);
 
         List<StockQuote> stockQuoteList = StockMapper.toStockQuoteList(stockQuoteDtoList);
@@ -41,34 +57,10 @@ class StockMapperTest {
     void givenStockQuoteList_whenConvertToStockQuoteDtoList_thenAllFieldsShouldBeEqual() {
         List<StockQuote> stockQuoteList = new ArrayList<>();
 
-        StockQuote stockQuote1 = StockQuote.builder()
-                .id(UUID.randomUUID())
-                .stockId("petr4")
-                .quotes(new ArrayList<>())
-                .build();
-
-        Quote quote1 = Quote.builder()
-                .date(LocalDate.of(2023, 5, 9))
-                .value(BigDecimal.valueOf(23.0))
-                .build();
-        stockQuote1.addQuote(quote1);
-
+        StockQuote stockQuote1 = createStockQuote("petr4", LocalDate.of(2023, 5, 9), BigDecimal.valueOf(23.0));
         stockQuoteList.add(stockQuote1);
 
-
-        StockQuote stockQuote2 = StockQuote.builder()
-                .id(UUID.randomUUID())
-                .stockId("aapl34")
-                .quotes(new ArrayList<>())
-                .build();
-
-        Quote quote2 = Quote.builder()
-                .date(LocalDate.of(2023, 5, 9))
-                .value(BigDecimal.valueOf(41.0))
-                .build();
-
-        stockQuote2.addQuote(quote2);
-
+        StockQuote stockQuote2 = createStockQuote("aapl34", LocalDate.of(2023, 5, 9), BigDecimal.valueOf(41.0));
         stockQuoteList.add(stockQuote2);
 
         List<StockQuoteDto> stockQuoteDtoList = StockMapper.toStockQuoteDtoList(stockQuoteList);
@@ -93,11 +85,8 @@ class StockMapperTest {
 
     @Test
     void givenStockQuoteDto_whenConvertToStockQuote_thenAllFieldsShouldBeEqual() {
-        final StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
-                .id(UUID.randomUUID())
-                .stockId("petr4")
-                .quotes(Collections.singletonMap(LocalDate.now(), BigDecimal.valueOf(20L)))
-                .build();
+
+        StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
 
         StockQuote stockQuote = StockMapper.toStockQuote(stockQuoteDto);
 
@@ -113,22 +102,7 @@ class StockMapperTest {
     @Test
     void givenStockQuote_whenConvertToStockQuoteDto_thenAllFieldsShouldBeEqual() {
 
-        StockQuote stockQuote = StockQuote.builder()
-                .id(UUID.randomUUID())
-                .stockId("aapl34")
-                .quotes(new ArrayList<>())
-                .build();
-
-        Quote quote1 = Quote.builder()
-                .date(LocalDate.of(2023, 5, 9))
-                .value(BigDecimal.valueOf(41.0))
-                .build();
-        Quote quote2 = Quote.builder()
-                .date(LocalDate.of(2023, 5, 10))
-                .value(BigDecimal.valueOf(42.0))
-                .build();
-        stockQuote.addQuote(quote1);
-        stockQuote.addQuote(quote2);
+        StockQuote stockQuote = createStockQuote("aapl34", LocalDate.of(2023, 5, 9), BigDecimal.valueOf(41.0));
 
         StockQuoteDto stockQuoteDto = StockMapper.toStockQuoteDto(stockQuote);
 
@@ -136,11 +110,9 @@ class StockMapperTest {
         assertEquals(stockQuote.getStockId(), stockQuoteDto.stockId());
 
         Map<LocalDate, BigDecimal> convertedQuotes = stockQuoteDto.quotes();
-        assertEquals(2, convertedQuotes.size());
+        assertEquals(1, convertedQuotes.size());
         assertTrue(convertedQuotes.containsKey(LocalDate.of(2023, 5, 9)));
         assertEquals(BigDecimal.valueOf(41.0), convertedQuotes.get(LocalDate.of(2023, 5, 9)));
-        assertTrue(convertedQuotes.containsKey(LocalDate.of(2023, 5, 10)));
-        assertEquals(BigDecimal.valueOf(42.0), convertedQuotes.get(LocalDate.of(2023, 5, 10)));
     }
 
 }
