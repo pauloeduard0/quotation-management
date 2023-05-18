@@ -1,8 +1,10 @@
 package com.inatel.quotationmanagement.controller;
 
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
-import com.inatel.quotationmanagement.service.StockQuoteService;
+import com.inatel.quotationmanagement.repository.StockRepository;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ import java.time.LocalDate;
 
 import java.util.Collections;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -27,15 +31,47 @@ class StockQuoteControllerTest {
     private WebTestClient webTestClient;
 
     @Autowired
-    private StockQuoteService stockQuoteService;
+    private StockRepository stockRepository;
+
+    private StockQuoteDto createStockQuoteDto(String stockId, LocalDate date, BigDecimal quoteValue) {
+        return StockQuoteDto.builder()
+                .stockId(stockId)
+                .quotes(Collections.singletonMap(date, quoteValue))
+                .build();
+    }
+
+    @BeforeEach
+    void setup() {
+
+        StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
+
+        webTestClient.post()
+                .uri("/quote")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(stockQuoteDto)
+                .exchange();
+
+        StockQuoteDto stockQuoteDto2 = createStockQuoteDto("aapl34", LocalDate.now(), BigDecimal.valueOf(40L));
+
+        webTestClient.post()
+                .uri("/quote")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(stockQuoteDto2)
+                .exchange();
+    }
+
+    @AfterEach
+    void cleanup() {
+
+        stockRepository.deleteAll();
+    }
 
     @Test
     void givenStockQuoteDto_whenSaveQuote_thenReturnHttpStatus201AndSavedStockQuoteDto() {
 
-        StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
-                .stockId("petr4")
-                .quotes(Collections.singletonMap(LocalDate.now(), BigDecimal.valueOf(20L)))
-                .build();
+        StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
 
         webTestClient.post()
                 .uri("/quote")
@@ -45,7 +81,7 @@ class StockQuoteControllerTest {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.stockId").isEqualTo(stockQuoteDto.stockId())
+                .jsonPath("$.stockId").isEqualTo("petr4")
                 .jsonPath("$.quotes").isNotEmpty();
     }
 
@@ -62,7 +98,7 @@ class StockQuoteControllerTest {
     }
 
     @Test
-    void givenStockId_whenGetQuotes_thenReturnHttpStatus200AndEmptyStockQuoteDtoList() {
+    void givenExistingStockId_whenGetQuotes_thenReturnStockQuotesList() {
 
         webTestClient.get()
                 .uri("/quote/{stockId}", "petr4")
@@ -70,7 +106,25 @@ class StockQuoteControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.content").isArray();
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content[0].stockId").isEqualTo("petr4")
+                .jsonPath("$.content[0].quotes").isNotEmpty();
+
     }
-    
+
+    @Test
+    void givenNoParameters_whenGetAllStockQuote_thenReturnHttpStatus200AndEmptyStockQuoteDtoList() {
+
+        webTestClient.get()
+                .uri("/quote")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content[?(@.stockId == 'petr4' || @.stockId == 'aapl34')]").exists()
+                .jsonPath("$.content[?(@.quotes)].stockId").value(containsInAnyOrder("petr4", "aapl34"))
+                .jsonPath("$.content[0].quotes").isNotEmpty();
+    }
+
 }
