@@ -26,8 +26,7 @@ public class StockQuoteController {
         return ResponseEntity.ok(stockQuoteService.getAllStockQuote(pageable));
     }
 
-    @GetMapping
-    @RequestMapping("/{stockId}")
+    @GetMapping("/{stockId}")
     public ResponseEntity<Page<StockQuoteDto>> getQuotes(@PathVariable String stockId, @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(stockQuoteService.getStockQuoteByStockId(stockId, pageable));
     }

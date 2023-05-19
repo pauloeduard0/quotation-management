@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @Component
-@WebFilter(urlPatterns = "/*")
+@WebFilter(urlPatterns = "/quote")
 @Order(-999)
 @Slf4j
 public class RequestFilter extends OncePerRequestFilter {
