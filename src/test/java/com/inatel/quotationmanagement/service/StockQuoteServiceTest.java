@@ -4,6 +4,7 @@ import com.inatel.quotationmanagement.adapter.StockAdapter;
 import com.inatel.quotationmanagement.exception.StockNotFoundException;
 import com.inatel.quotationmanagement.mapper.StockMapper;
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
+import com.inatel.quotationmanagement.model.entities.Quote;
 import com.inatel.quotationmanagement.model.entities.StockQuote;
 import com.inatel.quotationmanagement.model.rest.Stock;
 import com.inatel.quotationmanagement.repository.StockRepository;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,13 +39,34 @@ class StockQuoteServiceTest {
     @InjectMocks
     private StockQuoteService stockQuoteService;
 
+    private StockQuoteDto createStockQuoteDto(String stockId, LocalDate date, BigDecimal quoteValue) {
+        return StockQuoteDto.builder()
+                .stockId(stockId)
+                .quotes(Collections.singletonMap(date, quoteValue))
+                .build();
+    }
+
+    private StockQuote createStockQuote(String stockId, LocalDate date, BigDecimal quoteValue) {
+        StockQuote stockQuote = StockQuote.builder()
+                .id(UUID.randomUUID())
+                .stockId(stockId)
+                .quotes(new ArrayList<>())
+                .build();
+
+        Quote quote = Quote.builder()
+                .date(date)
+                .value(quoteValue)
+                .build();
+
+        stockQuote.addQuote(quote);
+
+        return stockQuote;
+    }
+
     @Test
     void givenValidStock_whenSavingStockQuote_thenReturnStockQuoteDto() {
 
-        final StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
-                .stockId("petr4")
-                .quotes(Collections.singletonMap(LocalDate.now(), BigDecimal.valueOf(20L)))
-                .build();
+        StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
 
         final Stock stock = Stock.builder()
                 .id("petr4")
@@ -66,14 +87,11 @@ class StockQuoteServiceTest {
         assertEquals(BigDecimal.valueOf(20L), result.quotes().get(LocalDate.now()));
     }
 
-
     @Test
     void givenInvalidStock_whenSaveStockQuote_thenThrowsStockNotFoundException() {
-        final StockQuoteDto stockQuoteDto = StockQuoteDto.builder()
-                .id(UUID.randomUUID())
-                .stockId("petr4")
-                .quotes(Collections.emptyMap())
-                .build();
+
+        StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
+
         when(stockAdapter.getAllStock()).thenReturn(Collections.emptyList());
 
         assertThrows(StockNotFoundException.class, () -> {
@@ -84,22 +102,16 @@ class StockQuoteServiceTest {
     @Test
     void givenValidStockId_whenGetStockQuoteByStockId_thenReturnStockQuoteDtoList() {
 
-
+        List<StockQuote> stockQuoteList = new ArrayList<>();
         String stockId = "petr4";
-        final StockQuote stockQuote1 = StockQuote.builder()
-                .id(UUID.randomUUID())
-                .stockId(stockId)
-                .quotes(Collections.emptyList())
-                .build();
-        final StockQuote stockQuote2 = StockQuote.builder()
-                .id(UUID.randomUUID())
-                .stockId(stockId)
-                .quotes(Collections.emptyList())
-                .build();
-        List<StockQuote> stockQuotes = Arrays.asList(stockQuote1, stockQuote2);
 
+        StockQuote stockQuote1 = createStockQuote(stockId, LocalDate.of(2023, 5, 9), BigDecimal.valueOf(23.0));
+        stockQuoteList.add(stockQuote1);
 
-        when(stockRepository.findByStockId(eq(stockId), any(Pageable.class))).thenReturn(new PageImpl<>(stockQuotes));
+        StockQuote stockQuote2 = createStockQuote(stockId, LocalDate.of(2023, 5, 9), BigDecimal.valueOf(23.0));
+        stockQuoteList.add(stockQuote2);
+
+        when(stockRepository.findByStockId(eq(stockId), any(Pageable.class))).thenReturn(new PageImpl<>(stockQuoteList));
 
         Page<StockQuoteDto> result = stockQuoteService.getStockQuoteByStockId(stockId, PageRequest.of(0, 10));
 
@@ -116,19 +128,16 @@ class StockQuoteServiceTest {
 
     @Test
     void givenValidStockQuote_whenGetAllStockQuote_thenReturnsStockQuoteDtoList() {
-        final StockQuote stockQuote1 = StockQuote.builder()
-                .id(UUID.randomUUID())
-                .stockId("petr4")
-                .quotes(Collections.emptyList())
-                .build();
-        final StockQuote stockQuote2 = StockQuote.builder()
-                .id(UUID.randomUUID())
-                .stockId("aapl34")
-                .quotes(Collections.emptyList())
-                .build();
-        List<StockQuote> stockQuotes = Arrays.asList(stockQuote1, stockQuote2);
 
-        when(stockRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(stockQuotes));
+        List<StockQuote> stockQuoteList = new ArrayList<>();
+
+        StockQuote stockQuote1 = createStockQuote("petr4", LocalDate.of(2023, 5, 9), BigDecimal.valueOf(23.0));
+        stockQuoteList.add(stockQuote1);
+
+        StockQuote stockQuote2 = createStockQuote("aapl34", LocalDate.of(2023, 5, 9), BigDecimal.valueOf(41.0));
+        stockQuoteList.add(stockQuote2);
+
+        when(stockRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(stockQuoteList));
 
         Page<StockQuoteDto> result = stockQuoteService.getAllStockQuote(PageRequest.of(0, 10));
 
@@ -146,6 +155,4 @@ class StockQuoteServiceTest {
         assertEquals(stockQuote2.getQuotes().size(), stockQuoteDto2.quotes().size());
     }
 
-
 }
-
