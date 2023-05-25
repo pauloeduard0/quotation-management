@@ -111,12 +111,12 @@ class StockQuoteServiceTest {
         StockQuote stockQuote2 = createStockQuote(stockId, LocalDate.of(2023, 5, 9), BigDecimal.valueOf(23.0));
         stockQuoteList.add(stockQuote2);
 
-        when(stockRepository.findByStockId(eq(stockId), any(Pageable.class))).thenReturn(new PageImpl<>(stockQuoteList));
+        when(stockRepository.findByStockId(stockId)).thenReturn(stockQuoteList);
 
-        Page<StockQuoteDto> result = stockQuoteService.getStockQuoteByStockId(stockId, PageRequest.of(0, 10));
+        List<StockQuoteDto> result = stockQuoteService.getStockQuoteByStockId(stockId);
 
         assertNotNull(result);
-        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.size());
 
         result.forEach(stockQuoteDto -> assertEquals(stockId, stockQuoteDto.stockId()));
 

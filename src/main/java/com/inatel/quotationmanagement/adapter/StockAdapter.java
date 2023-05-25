@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,7 +16,6 @@ import org.springframework.web.reactive.function.client.WebClientException;
 import java.util.Arrays;
 import java.util.List;
 
-@EnableCaching
 @Service
 @Slf4j
 public class StockAdapter {
@@ -34,12 +32,14 @@ public class StockAdapter {
     @Value("${server.manager.port}")
     private String stockManagerPort;
 
-    private String stockManagerBaseUrl;
-    private WebClient webClient;
+    private final String stockManagerBaseUrl;
+    private final WebClient webClient;
 
-    @PostConstruct
-    public void buildStockManagerBaseUrl() {
-        this.stockManagerBaseUrl = String.format("http://%s:%s", this.stockManagerHost, this.stockManagerPort);
+    public StockAdapter(
+            @Value("${server.manager.host}") String stockManagerHost,
+            @Value("${server.manager.port}") String stockManagerPort
+    ) {
+        this.stockManagerBaseUrl = String.format("http://%s:%s", stockManagerHost, stockManagerPort);
         this.webClient = WebClient.builder()
                 .baseUrl(this.stockManagerBaseUrl)
                 .build();
@@ -68,8 +68,6 @@ public class StockAdapter {
                     .port(this.serverPort)
                     .build();
 
-            webClient = WebClient.builder().baseUrl("http://" + this.stockManagerHost + ":" + this.stockManagerPort).build();
-
             return webClient.post()
                     .uri("/notification")
                     .body(BodyInserters.fromValue(notification))
@@ -81,5 +79,5 @@ public class StockAdapter {
             throw new StockManagerConnectionException(this.stockManagerBaseUrl);
         }
     }
-    
+
 }

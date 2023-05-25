@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/quote")
 @Slf4j
@@ -27,8 +29,8 @@ public class StockQuoteController {
     }
 
     @GetMapping("/{stockId}")
-    public ResponseEntity<Page<StockQuoteDto>> getQuotes(@PathVariable String stockId, @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(stockQuoteService.getStockQuoteByStockId(stockId, pageable));
+    public ResponseEntity<List<StockQuoteDto>> getQuotes(@PathVariable String stockId) {
+        return ResponseEntity.ok(stockQuoteService.getStockQuoteByStockId(stockId));
     }
 
     @Transactional
