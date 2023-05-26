@@ -106,14 +106,14 @@ class StockQuoteControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.content").isArray()
-                .jsonPath("$.content[0].stockId").isEqualTo("petr4")
-                .jsonPath("$.content[0].quotes").isNotEmpty();
+                .jsonPath("$").isArray()
+                .jsonPath("$[0].stockId").isEqualTo("petr4")
+                .jsonPath("$[0].quotes").isNotEmpty();
 
     }
 
     @Test
-    void givenNoParameters_whenGetAllStockQuote_thenReturnHttpStatus200AndEmptyStockQuoteDtoList() {
+    void givenNoParameters_whenGetAllStockQuote_thenReturnHttpStatus200StockQuoteDtoList() {
 
         webTestClient.get()
                 .uri("/quote")
