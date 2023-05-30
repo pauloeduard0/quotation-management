@@ -1,17 +1,20 @@
 package com.inatel.quotationmanagement.service;
 
 import com.inatel.quotationmanagement.adapter.StockAdapter;
-import com.inatel.quotationmanagement.exception.StockNotFoundException;
 import com.inatel.quotationmanagement.mapper.StockMapper;
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
 import com.inatel.quotationmanagement.model.entities.Quote;
 import com.inatel.quotationmanagement.model.entities.StockQuote;
-import com.inatel.quotationmanagement.model.rest.Stock;
 import com.inatel.quotationmanagement.repository.StockRepository;
+import com.inatel.quotationmanagement.service.validation.StockValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,14 +23,17 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 class StockQuoteServiceTest {
 
     @Mock
@@ -35,6 +41,12 @@ class StockQuoteServiceTest {
 
     @Mock
     private StockRepository stockRepository;
+
+    @Mock
+    private StockMapper stockMapper;
+
+    @Mock
+    private List<StockValidator> stockValidator;
 
     @InjectMocks
     private StockQuoteService stockQuoteService;
@@ -64,42 +76,6 @@ class StockQuoteServiceTest {
     }
 
     @Test
-    void givenValidStock_whenSavingStockQuote_thenReturnStockQuoteDto() {
-
-        StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
-
-        final Stock stock = Stock.builder()
-                .id("petr4")
-                .description("Stock petr4")
-                .build();
-
-        when(stockAdapter.getAllStock()).thenReturn(Arrays.asList(stock));
-
-        when(stockRepository.save(any(StockQuote.class))).thenReturn(StockMapper.toStockQuote(stockQuoteDto));
-
-        StockQuoteDto result = stockQuoteService.saveStockQuote(stockQuoteDto);
-
-        assertNotNull(result);
-        assertEquals(stockQuoteDto.id(), result.id());
-        assertEquals(stockQuoteDto.stockId(), result.stockId());
-        assertEquals(stockQuoteDto.quotes().size(), result.quotes().size());
-        assertTrue(result.quotes().containsKey(LocalDate.now()));
-        assertEquals(BigDecimal.valueOf(20L), result.quotes().get(LocalDate.now()));
-    }
-
-    @Test
-    void givenInvalidStock_whenSaveStockQuote_thenThrowsStockNotFoundException() {
-
-        StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
-
-        when(stockAdapter.getAllStock()).thenReturn(Collections.emptyList());
-
-        assertThrows(StockNotFoundException.class, () -> {
-            stockQuoteService.saveStockQuote(stockQuoteDto);
-        });
-    }
-
-    @Test
     void givenValidStockId_whenGetStockQuoteByStockId_thenReturnStockQuoteDtoList() {
 
         List<StockQuote> stockQuoteList = new ArrayList<>();
@@ -124,6 +100,30 @@ class StockQuoteServiceTest {
             assertNotNull(stockQuoteDto.id());
             assertNotNull(stockQuoteDto.quotes());
         });
+    }
+
+    @Test
+    void givenValidStock_whenSavingStockQuote_thenReturnStockQuoteDto() {
+
+        StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
+
+        StockQuote stockQuote = createStockQuote("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
+
+        try (MockedStatic<StockMapper> stockMapperMock = Mockito.mockStatic(StockMapper.class)) {
+            stockMapperMock.when(() -> StockMapper.toStockQuote(stockQuoteDto)).thenReturn(stockQuote);
+            stockMapperMock.when(() -> StockMapper.toStockQuoteDto(stockQuote)).thenReturn(stockQuoteDto);
+
+            when(stockRepository.save(any(StockQuote.class))).thenReturn(stockQuote);
+
+            StockQuoteDto result = stockQuoteService.saveStockQuote(stockQuoteDto);
+
+            assertNotNull(result);
+            assertEquals(stockQuoteDto.id(), result.id());
+            assertEquals(stockQuoteDto.stockId(), result.stockId());
+            assertEquals(stockQuoteDto.quotes().size(), result.quotes().size());
+            assertTrue(result.quotes().containsKey(LocalDate.now()));
+            assertEquals(BigDecimal.valueOf(20L), result.quotes().get(LocalDate.now()));
+        }
     }
 
     @Test
