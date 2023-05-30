@@ -3,12 +3,14 @@ package com.inatel.quotationmanagement.mapper;
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
 import com.inatel.quotationmanagement.model.entities.Quote;
 import com.inatel.quotationmanagement.model.entities.StockQuote;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 public class StockMapper {
     public static List<StockQuote> toStockQuoteList(List<StockQuoteDto> stockQuoteDTOList) {
         return stockQuoteDTOList.stream().map(StockMapper::toStockQuote).collect(Collectors.toList());
