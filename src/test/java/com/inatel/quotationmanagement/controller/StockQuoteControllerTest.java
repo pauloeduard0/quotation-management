@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -94,7 +95,10 @@ class StockQuoteControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue("{ \"stockId\": \"Petr4\", \"quotes\": { \"2023-05-15\": \"invalid\" } }")
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.title").value(equalTo("Invalid Format Exception"))
+                .jsonPath("$.type").value(equalTo("https://api.quotationmanagement.com/errors/bad-request"));
     }
 
     @Test
