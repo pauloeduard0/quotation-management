@@ -1,10 +1,12 @@
 package com.inatel.quotationmanagement.service;
 
+import com.inatel.quotationmanagement.adapter.StockAdapter;
 import com.inatel.quotationmanagement.mapper.StockMapper;
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
 import com.inatel.quotationmanagement.model.entities.Quote;
 import com.inatel.quotationmanagement.model.entities.StockQuote;
 import com.inatel.quotationmanagement.repository.StockRepository;
+import com.inatel.quotationmanagement.service.validation.StockValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -36,6 +38,9 @@ class StockQuoteServiceTest {
 
     @Mock
     private StockRepository stockRepository;
+
+    @Mock
+    private List<StockValidator> stockValidator;
 
     @InjectMocks
     private StockQuoteService stockQuoteService;
