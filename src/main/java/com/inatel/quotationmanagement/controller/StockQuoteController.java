@@ -5,7 +5,6 @@ import com.inatel.quotationmanagement.service.StockQuoteService;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -20,8 +19,11 @@ import java.util.List;
 @Slf4j
 public class StockQuoteController {
 
-    @Autowired
-    private StockQuoteService stockQuoteService;
+    private final StockQuoteService stockQuoteService;
+
+    public StockQuoteController(StockQuoteService stockQuoteService) {
+        this.stockQuoteService = stockQuoteService;
+    }
 
     @GetMapping
     public ResponseEntity<Page<StockQuoteDto>> getAllQuotes(@PageableDefault(size = 20) Pageable pageable) {
