@@ -3,9 +3,7 @@ package com.inatel.quotationmanagement.controller;
 import com.inatel.quotationmanagement.model.dto.StockQuoteDto;
 import com.inatel.quotationmanagement.repository.StockRepository;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -24,6 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 class StockQuoteControllerTest {
@@ -41,7 +40,7 @@ class StockQuoteControllerTest {
                 .build();
     }
 
-    @BeforeEach
+    @BeforeAll
     void setup() {
 
         StockQuoteDto stockQuoteDto = createStockQuoteDto("petr4", LocalDate.now(), BigDecimal.valueOf(20L));
@@ -63,7 +62,7 @@ class StockQuoteControllerTest {
                 .exchange();
     }
 
-    @AfterEach
+    @AfterAll
     void cleanup() {
 
         stockRepository.deleteAll();
