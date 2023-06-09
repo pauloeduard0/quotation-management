@@ -24,12 +24,11 @@ docker network create inatel
 
 - Start the MySql database:
 
-docker container run --name mysql --network=inatel -e MYSQL_ROOT_PASSWORD=root -e
-MYSQL_DATABASE=bootdb -p 3306:3306 -p 33060:33060 -d mysql
+docker container run --name mysql --network=inatel -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bootdb -p 3306:3306 -p 33060:33060 -d mysql
 
 - Start the Stock Manager application:
 
-docker container run –-name stockmanager --network=inatel -p 8080:8080 -d adautomendes/stock-manager
+docker container run --name stockmanager --network=inatel -p 8080:8080 -d adautomendes/stock-manager
 
 
 ---
