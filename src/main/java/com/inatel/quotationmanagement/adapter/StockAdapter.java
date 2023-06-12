@@ -75,7 +75,6 @@ public class StockAdapter {
                     .bodyToMono(Notification[].class)
                     .block();
         } catch (WebClientException webClientException) {
-            webClientException.printStackTrace();
             throw new StockManagerConnectionException(this.stockManagerBaseUrl);
         }
     }
