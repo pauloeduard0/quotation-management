@@ -29,7 +29,7 @@ class DefaultStockValidatorTest {
     }
 
     @Test
-    void testIsValid_StockNotFound() {
+    void givenStockNotFound_whenIsValidCalled_thenThrowStockNotFoundException() {
         Mockito.when(stockAdapter.getAllStock()).thenReturn(Collections.emptyList());
 
         StockQuote stockQuote = new StockQuote();
